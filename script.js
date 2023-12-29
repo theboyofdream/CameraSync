@@ -56,6 +56,28 @@ function removeOldScreens() {
 }
 function updateScreenPosition() {
   video?.setAttribute("style", `transform: translate(-${window.screenX}px, -${window.screenY}px)`);
+  //
+
+
+  // $('#log').innerHTML = ``
+  // for (let [id, s] of getAllScreens()) {
+  //   if (id === currentScreenId) {
+  //     // ctx.fillStyle = "#000";
+  //     // ctx.fillRect(0, 0, canvas.width, canvas.height);
+  //     // canvas.width = s.width;
+  //     // canvas.height = s.height;
+  //     // ctx.drawImage(video, s.screenX, s.screenY, s.width, s.height, 0, 0, s.width, s.height);
+  //     for (let k in s) {
+  //       $('#log').innerHTML += `<span>${k}</span><span>${s[k]}</span>`
+  //     }
+  //     break
+  //   }
+  //   // $('#box').style.left = `${s.screenX}px`;
+  //   // $('#box').style.top = `${s.screenY}px`;
+  //   // $('#box').style.width = `${s.screenWidth}px`;
+  //   // $('#box').style.height = `${s.screenWidth}px`;
+  // }
+  //
 }
 
 
@@ -64,7 +86,6 @@ function updateDom() {
     if (screen.cameraStarted && !startCameraBtn.classList.contains('hide')) {
       startCamera()
       startCameraBtn.classList.add('hide')
-      break
     }
     if (!screen.cameraStarted) {
       startCameraBtn.classList.remove('hide')
@@ -74,13 +95,8 @@ function updateDom() {
 
 function onClose() {
   removeScreen();
+  return ""
 }
-/* function syncDom() {
-  if (window.localStorage.getItem("start-btn") === "clicked") {
-    startCamera()
-  }
-} */
-
 
 function startCamera() {
   navigator.mediaDevices
@@ -94,6 +110,9 @@ function startCamera() {
         video.height = window.screen.availHeight;
         video.srcObject = stream;
         video.play();
+
+        // canvas.width = window.screen.availWidth;
+        // canvas.height = window.screen.availHeight;
 
         timers.push(...[
           setInterval(setScreenDetails, 10),
@@ -109,30 +128,56 @@ function startCamera() {
 }
 
 function saveImage() {
-  canvas.width = window.outerWidth;
-  canvas.height = window.outerHeight;
-  ctx.drawImage(video, 0, 0, window.outerWidth, window.outerHeight);
+  canvas.width = window.screen.availWidth;
+  canvas.height = window.screen.availHeight;
+  // canvas.width = video.width;
+  // canvas.height = video.height;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (const [screenId, screen] of getAllScreens()) {
+    ctx.rect(screen.screenX, screen.screenY, screen.width, screen.height)
+    ctx.fillStyle = 'yellow';
+    ctx.fill();
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+    // ctx.drawImage(video, screen.screenX, screen.screenY, screen.width, screen.height, screen.screenX, screen.screenY, screen.width, screen.height);
+    // ctx.drawImage(video, 0, 0, screen.screenWidth, screen.screenHeight);
+    // ctx.drawImage(video, 0, 0, screen.screenWidth, screen.screenHeight);
+  }
 
   const a = document.createElement("a")
   a.href = canvas.toDataURL("image/png");
   a.download = `${Date.now()}.png`
-  a.click();
+  // a.click();
 
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  $('dialog img').src = a.href;
+  $('dialog button#closeDialog').onclick = function () {
+    $('dialog').close()
+    $('dialog').setAttribute("z-index", "0");
+    $('dialog img').src = "";
+  }
+  $('dialog').setAttribute("z-index", "9999");
+  $('dialog').showModal()
+
+  // ctx.fillStyle = "#000";
+  // ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 function startRecording() {
   startCamera();
 }
 // function saveVideo() {}
 
+// window.onbeforeunload = onClose;
 function init() {
   startCameraBtn.onclick = startCamera
   saveImageBtn.onclick = saveImage
   startRecordingBtn.onclick = startRecording
 
   timers.push(setInterval(updateDom, 10))
-
-  window.onbeforeunload = onClose
 }
 init()
