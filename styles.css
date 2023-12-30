@@ -62,24 +62,3 @@ button#startCamera.hide {
   opacity: 0;
   z-index: -9;
 }
-
-dialog img {
-  max-width: 300px;
-}
-
-span#box {
-  border: 3px dashed red;
-  position: absolute;
-  z-index: 9999;
-  opacity: 0;
-}
-
-#log {
-  position: fixed;
-  top: 0;
-  left: 0;
-  color: whitesmoke;
-  background-color: #00000080;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
